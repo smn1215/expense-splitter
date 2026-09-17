@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Expense Splitter</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; background-color: #f4f4f9; }
+        .container { max-width: 600px; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        form { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+        input, button { padding: 10px; font-size: 14px; }
+        button { background-color: #007bff; color: white; border: none; cursor: pointer; border-radius: 4px; }
+        ul { list-style-type: none; padding: 0; }
+        li { background: #eee; margin-bottom: 5px; padding: 10px; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Expense Splitter</h2>
+        <form id="expense-form">
+            <input type="text" id="payer" placeholder="Paid By (Name)" required>
+            <input type="number" id="amount" step="0.01" placeholder="Amount ($)" required>
+            <input type="text" id="description" placeholder="Description" required>
+            <button type="submit">Add Expense</button>
+        </form>
+
+        <h3>Expenses List</h3>
+        <ul id="expense-list"></ul>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:8000/api/expenses';
+
+        async function fetchExpenses() {
+            const res = await fetch(API_URL);
+            const data = await res.json();
+            const list = document.getElementById('expense-list');
+            list.innerHTML = '';
+            data.expenses.forEach(item => {
+                const li = document.createElement('li');
+                li.textContent = `${item.payer} paid $${item.amount.toFixed(2)} for ${item.description}`;
+                list.appendChild(li);
+            });
+        }
+
+        document.getElementById('expense-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const payer = document.getElementById('payer').value;
+            const amount = parseFloat(document.getElementById('amount').value);
+            const description = document.getElementById('description').value;
+
+            await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ payer, amount, description })
+            });
+
+            document.getElementById('expense-form').reset();
+            fetchExpenses();
+        });
+
+        fetchExpenses();
+    </script>
+</body>
+</html>
