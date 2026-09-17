@@ -1,0 +1,34 @@
+openapi: 3.0.3
+info:
+  title: Expense Splitter API
+  version: 1.0.0
+  description: API for managing shared expenses and calculating settlements.
+paths:
+  /api/expenses:
+    get:
+      summary: Get all expenses and current balances
+      responses:
+        '200':
+          description: Successful response
+    post:
+      summary: Add a new expense
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - payer
+                - amount
+                - description
+              properties:
+                payer:
+                  type: string
+                amount:
+                  type: number
+                description:
+                  type: string
+      responses:
+        '201':
+          description: Expense created
